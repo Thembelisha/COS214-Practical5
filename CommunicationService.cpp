@@ -13,6 +13,7 @@ CommunicationService::CommunicationService() : ResponseComponent() {
 }
 
 void CommunicationService::receiveEmergencyMessage(std::string myId, std::string em) {
+    
     std::cout << "CommunicationService: routing alert to the appropriate team." << std::endl;
 
     if (this->emergency == nullptr) {
