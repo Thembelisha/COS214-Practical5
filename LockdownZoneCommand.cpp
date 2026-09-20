@@ -4,5 +4,5 @@
     this->em=em;
  }
     void  LockdownZoneCommand::execute() {
-
+        em->lockdown();
     }

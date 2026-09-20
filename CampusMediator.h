@@ -15,15 +15,19 @@ class Participant {
 class CampusMediator{
 
 public:
-    CampusMediator(ResponseComponent*);
-    int addParticipant(ResponseComponent*);
+    CampusMediator(std::string loc,std::string em);
+    int addParticipant(ResponseComponent* me);
     void notifyComponent(std::string emergency,std::string location);
+    void cancelEmergency();
     bool communicate(int _id,std::string emergency);
     void removeParticipant(int);
+    void lockdown();
 
 protected:
         std::vector<Participant* >participant;
         int nextId;
+        std::string emergency;
+        std::string location;
 
 };
 

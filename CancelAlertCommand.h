@@ -9,7 +9,7 @@ class CancelAlertCommand: public EmergencyCommand{
 
   public:
    CancelAlertCommand(EmergencyMediator* em);
-    void execute() override;
+    void execute(std::string emergency,std::string loc) override;
 
     private:
     EmergencyMediator* em;

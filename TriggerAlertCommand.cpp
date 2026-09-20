@@ -4,5 +4,5 @@
     this->em=em;
  }
     void TriggerAlertCommand::execute(){
-
+        em->notifyComponent();
     }
