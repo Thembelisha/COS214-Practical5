@@ -7,11 +7,11 @@ class EmergencyMediator;
 
 class LockdownZoneCommand: public EmergencyCommand{
 
-  public:
-   LockdownZoneCommand(EmergencyMediator* em);
+public:
+    LockdownZoneCommand(EmergencyMediator* em);
     void execute() override;
 
-    private:
+private:
     EmergencyMediator* em;
 
 };

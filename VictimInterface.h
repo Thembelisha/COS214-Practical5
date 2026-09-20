@@ -4,11 +4,10 @@
 #include "ResponseComponent.h"
 
 class VictimInterface: public ResponseComponent{
-
-    
-VictimInterface();
-void receiveEmergencyMessage(int myId,std::string em) override;
-void sendResponse() override;
+public:
+    VictimInterface();
+    void receiveEmergencyMessage(std::string myId,std::string em) override;
+    void sendResponse() override;
 };
 
 

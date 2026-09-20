@@ -1,13 +1,37 @@
 #include "ResponseComponent.h"
+#include "CampusMediator.h"
 
-ResponseComponent(){
-    emergency=0;
-    myId=-1;
+ResponseComponent::ResponseComponent() {
+    emergency = nullptr;
+    myId = "unknown-responder";
 }
-void reg(CampusMediator* em ){
-    emergency=em;
-    myId=emergency->addParticipant(this);
+
+void ResponseComponent::reg(CampusMediator* em) {
+    emergency = em;
+    myId = emergency->addParticipant(this);
 }
-void cancel(){
-    emergency->removeParticipant(myId);
+
+void ResponseComponent::cancel() {
+    if (emergency != nullptr) {
+        emergency->removeParticipant(myId);
+    }
+}
+
+std::string ResponseComponent::getId() const {
+    return myId;
+}
+
+void ResponseComponent::setId(const std::string& id) {
+    myId = id;
+}
+
+std::string ResponseComponent::getCategory() const {
+    return category;
+}
+
+void ResponseComponent::setCategory(const std::string& newCategory) {
+    category = newCategory;
+}
+
+ResponseComponent::~ResponseComponent() {
 }

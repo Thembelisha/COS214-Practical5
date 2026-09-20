@@ -1,10 +1,14 @@
 #include "CancelAlertCommand.h"
+#include "EmergencyMediator.h"
 
-  CancelAlertCommand::CancelAlertCommand(EmergencyMediator* em){
+CancelAlertCommand::CancelAlertCommand(EmergencyMediator* em) {
+    this->em = em;
+}
 
-this->em=em;
- }
-    void  CancelAlertCommand::execute(std::string em,std::string loc){
-
-        em->cancelEmergency();
+void CancelAlertCommand::execute(std::string emergency, std::string loc) {
+    (void)emergency;
+    (void)loc;
+    if (this->em != nullptr) {
+        this->em->cancelEmergency();
     }
+}

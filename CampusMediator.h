@@ -8,7 +8,7 @@
 
 class Participant {
   public:
-    int    id;
+    std::string id;
     ResponseComponent*  resp;
 };
 
@@ -16,16 +16,17 @@ class CampusMediator{
 
 public:
     CampusMediator(std::string loc,std::string em);
-    int addParticipant(ResponseComponent* me);
+    std::string addParticipant(ResponseComponent* me);
     void notifyComponent(std::string emergency,std::string location);
+    void notifyComponent();
+    void notifyByCategory(const std::string& incidentType, const std::string& emergency, const std::string& location);
     void cancelEmergency();
-    bool communicate(int _id,std::string emergency);
-    void removeParticipant(int);
+    bool communicate(std::string _id,std::string emergency);
+    void removeParticipant(std::string);
     void lockdown();
 
 protected:
         std::vector<Participant* >participant;
-        int nextId;
         std::string emergency;
         std::string location;
 

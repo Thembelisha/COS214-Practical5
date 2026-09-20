@@ -1,23 +1,31 @@
 #include "VictimInterface.h"
+#include "CampusMediator.h"
+
+#include <cstdlib>
 #include <iostream>
+#include <sstream>
+#include <string>
 
-VictimInterface::VictimInterface():ResponseComponent(){
-
-std::cout<<"I am in need of help"<<std::endl;
+VictimInterface::VictimInterface() : ResponseComponent() {
+    this->myId = "victim-interface-1";
+    this->setCategory("victim");
 }
-void VictimInterface::receiveEmergencyMessage(int myId,std::string em) {
-std::cout<<myId<<"received message  "<<em<<std::endl;
+
+void VictimInterface::receiveEmergencyMessage(std::string myId, std::string em) {
+    (void)myId;
+    (void)em;
 }
-void VictimInterface::sendResponse(){
-  string toId;
-  string msg;
-  cout<<"Student "<<myId<<" send message to? ";
-  getline(cin,toId,'\n');
 
-  cout<<"Student "<<myId<<" message? ";
-  getline(cin,msg,'\n');
+void VictimInterface::sendResponse() {
+    std::string toId;
+    std::string msg;
+    std::cout << "Student " << myId << " send message to? ";
+    std::getline(std::cin, toId, '\n');
 
-  ostringstream convert;
-  convert << myId;
-  CampusMediator->communicate(atoi(toId.c_str()),convert.str()+": "+msg);
+    std::cout << "Student " << myId << " message? ";
+    std::getline(std::cin, msg, '\n');
+
+    if (this->emergency != nullptr) {
+        this->emergency->communicate(toId, myId + ": " + msg);
+    }
 }

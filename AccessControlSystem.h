@@ -6,10 +6,10 @@
 #include "ResponseComponent.h"
 
 class AccessControlSystem: public ResponseComponent{
-
-AccessControlSystem();
-void receiveEmergencyMessage(int myId,std::string em) override;
-void sendResponse() override;
+public:
+    AccessControlSystem();
+    void receiveEmergencyMessage(std::string myId,std::string em) override;
+    void sendResponse() override;
 
 
 };
