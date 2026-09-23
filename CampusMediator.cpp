@@ -18,12 +18,19 @@ CampusMediator::CampusMediator(std::string loc, std::string em) {
     emergency = em;
 }
 
-void CampusMediator::addParticipant(Participant* me) 
-{
-    if (me != nullptr)
-    {
-        participant.push_back(me);
+CampusMediator::~CampusMediator() {
+    for (std::vector<Participant*>::iterator it = participant.begin(); it != participant.end(); ++it) {
+        delete *it;
     }
+    participant.clear();
+}
+
+std::string CampusMediator::addParticipant(ResponseComponent* me) {
+    Participant* person = new Participant();
+    person->resp = me;
+    person->id = me->getId();
+    participant.push_back(person);
+    return person->id;
 }
 
 void CampusMediator::notifyComponent(std::string emergencyMessage, std::string locationMessage) {
@@ -78,6 +85,7 @@ void CampusMediator::removeParticipant(std::string idToRemove) {
 
     for (it = participant.begin(); it != participant.end(); ++it) {
         if ((*it)->id == idToRemove) {
+            delete *it;
             participant.erase(it);
             break;
         }
@@ -90,4 +98,5 @@ void CampusMediator::cancelEmergency() {
 
 void CampusMediator::lockdown() {
     std::cout << "Campus lockdown initiated." << std::endl;
+    //link a decorator here i think
 }

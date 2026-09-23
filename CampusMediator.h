@@ -16,7 +16,8 @@ class CampusMediator{
 
 public:
     CampusMediator(std::string loc,std::string em);
-    void addParticipant(Participant* me);
+    ~CampusMediator();
+    std::string addParticipant(ResponseComponent* me);
     void notifyComponent(std::string emergency,std::string location);
     void notifyComponent();
     void notifyByCategory(const std::string& incidentType, const std::string& emergency, const std::string& location);
