@@ -3,9 +3,9 @@
 
 #include "ResponseComponent.h"
 
-class FacilitiesStuff : public ResponseComponent{
+class FacilitiesStaff : public ResponseComponent{
 public:
-    FacilitiesStuff();
+    FacilitiesStaff();
     void receiveEmergencyMessage(std::string myId,std::string em) override;
     void sendResponse() override;
 

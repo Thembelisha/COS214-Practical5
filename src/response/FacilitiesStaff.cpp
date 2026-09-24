@@ -1,4 +1,4 @@
-#include "FacilitiesStuff.h"
+#include "FacilitiesStaff.h"
 #include "CampusMediator.h"
 
 #include <cstdlib>
@@ -6,24 +6,24 @@
 #include <sstream>
 #include <string>
 
-FacilitiesStuff::FacilitiesStuff() : ResponseComponent() {
+FacilitiesStaff::FacilitiesStaff() : ResponseComponent() {
     this->myId = "facilities-team-1";
     this->setCategory("facilities");
-    std::cout << "faculty team responding to incident" << std::endl;
+    std::cout << "Facilities team responding to incident" << std::endl;
 }
 
-void FacilitiesStuff::receiveEmergencyMessage(std::string myId, std::string em) {
+void FacilitiesStaff::receiveEmergencyMessage(std::string myId, std::string em) {
     std::cout << myId << " received emergency from " << em << std::endl;
-    std::cout << "FacilitiesStuff: Acknowledge and respond to the incident." << std::endl;
+    std::cout << "FacilitiesStaff: Acknowledge and respond to the incident." << std::endl;
 }
 
-void FacilitiesStuff::sendResponse() {
+void FacilitiesStaff::sendResponse() {
     std::string toId;
     std::string msg;
-    std::cout << "fuculty " << myId << " send message to? ";
+    std::cout << "Facilities " << myId << " send message to? ";
     std::getline(std::cin, toId, '\n');
 
-    std::cout << "fuculty" << myId << " message? ";
+    std::cout << "Facilities" << myId << " message? ";
     std::getline(std::cin, msg, '\n');
 
     if (this->emergency != nullptr) {

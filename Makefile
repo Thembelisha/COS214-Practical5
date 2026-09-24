@@ -1,16 +1,39 @@
-CXX = g++
-CXXFLAGS = -std=c++11 -Wall -Wextra -pedantic
-TARGET = campusguard
-SRC = $(wildcard *.cpp)
-OBJ = $(SRC:.cpp=.o)
+CXX := g++
+CXXFLAGS := -std=c++11 -Wall -Wextra -pedantic
+
+INCLUDE_DIRS := $(wildcard include/campusguard/*)
+CPPFLAGS := $(addprefix -I,$(INCLUDE_DIRS))
+
+TARGET := bin/campusguard
+SRC := $(wildcard src/*/*.cpp)
+OBJ := $(patsubst src/%.cpp,build/%.o,$(SRC))
+DEP := $(OBJ:.o=.d)
+
+TEST_SRC := $(wildcard tests/*.cpp)
+TEST_BIN := $(patsubst tests/%.cpp,bin/tests/%,$(TEST_SRC))
 
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $(OBJ) -o $@
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+build/%.o: src/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
+
+bin/tests/%: tests/%.cpp $(SRC)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< $(SRC) -o $@
+
+check:
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fsyntax-only $(SRC)
+
+test: $(TEST_BIN)
+	@for test_binary in $(TEST_BIN); do \
+		echo "Running $$test_binary"; \
+		$$test_binary; \
+	done
 
 run: $(TARGET)
 	./$(TARGET)
@@ -19,6 +42,8 @@ valgrind: $(TARGET)
 	valgrind --leak-check=full --track-origins=yes ./$(TARGET)
 
 clean:
-	rm -f $(OBJ) $(TARGET)
+	$(RM) -r build bin
 
-.PHONY: all run valgrind clean
+-include $(DEP)
+
+.PHONY: all check test run valgrind clean
