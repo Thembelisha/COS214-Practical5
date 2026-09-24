@@ -1,11 +1,9 @@
 CXX := g++
 CXXFLAGS := -std=c++11 -Wall -Wextra -pedantic
-
-INCLUDE_DIRS := $(wildcard include/campusguard/*)
-CPPFLAGS := $(addprefix -I,$(INCLUDE_DIRS))
+CPPFLAGS := -Iinclude
 
 TARGET := bin/campusguard
-SRC := $(wildcard src/*/*.cpp)
+SRC := $(wildcard src/*.cpp)
 OBJ := $(patsubst src/%.cpp,build/%.o,$(SRC))
 DEP := $(OBJ:.o=.d)
 
