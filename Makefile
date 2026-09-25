@@ -4,11 +4,12 @@ CPPFLAGS := -Iinclude
 
 TARGET := bin/campusguard
 SRC := $(wildcard src/*.cpp)
-OBJ := $(patsubst src/%.cpp,build/%.o,$(SRC))
+APP_SRC := Main.cpp
+OBJ := $(patsubst src/%.cpp,build/%.o,$(SRC)) build/Main.o
 DEP := $(OBJ:.o=.d)
 
-TEST_SRC := $(wildcard tests/*.cpp)
-TEST_BIN := $(patsubst tests/%.cpp,bin/tests/%,$(TEST_SRC))
+TEST_SRC := tests/MainTest.cpp
+TEST_BIN := bin/tests/main
 
 all: $(TARGET)
 
@@ -20,9 +21,13 @@ build/%.o: src/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
-bin/tests/%: tests/%.cpp $(SRC)
+build/Main.o: Main.cpp
 	@mkdir -p $(dir $@)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< $(SRC) -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
+
+bin/tests/main: $(TEST_SRC) $(SRC)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TEST_SRC) $(SRC) -o $@
 
 check:
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fsyntax-only $(SRC)
