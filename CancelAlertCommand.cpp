@@ -7,6 +7,6 @@ CancelAlertCommand::CancelAlertCommand(EmergencyMediator* em) {
 
 void CancelAlertCommand::execute() {
     if (this->em != nullptr) {
-        this->em->cancelEmergency();
+        this->em->cancelEmergency(); 
     }
 }

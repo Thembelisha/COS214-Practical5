@@ -85,7 +85,10 @@ void CampusMediator::removeParticipant(std::string idToRemove) {
 }
 
 void CampusMediator::cancelEmergency() {
-    std::cout << "The emergency has been resolved" << std::endl;
+    for (auto* p : participant) {
+        p->resp->receiveEmergencyMessage(p->id, "Alert cancelled for " + location);
+    }
+    std::cout << "Emergency cancelled at " << location << std::endl;
 }
 
 void CampusMediator::lockdown() {
