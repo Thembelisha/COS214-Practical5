@@ -23,9 +23,9 @@ public:
     void notifyComponent(std::string emergency, std::string location);
     void notifyComponent();
     void notifyByCategory(
-        const std::string& incidentType,
-        const std::string& emergency,
-        const std::string& location);
+    const std::string& incidentType,
+    const std::string& emergency,
+    const std::string& location);
     void cancelEmergency();
     bool communicate(std::string id, std::string emergency);
     void removeParticipant(std::string id);

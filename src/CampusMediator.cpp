@@ -42,7 +42,6 @@ std::string CampusMediator::addParticipant(ResponseComponent* me)
     if (me == nullptr) {
         return "";
     }
-
     Participant* person = new Participant();
     person->resp = me;
     person->id = me->getId();
@@ -133,23 +132,24 @@ void CampusMediator::removeParticipant(std::string idToRemove)
 void CampusMediator::cancelEmergency()
 {
     std::cout << "The emergency has been resolved" << std::endl;
+    emergency = "Resolved";
 }
 
 void CampusMediator::lockdown()
 {
     std::cout << "Campus lockdown initiated." << std::endl;
+    communicate("communication-service-1","Lockdown required at " + location);
 }
 
 void CampusMediator::issueEvacuation(const std::string& instructions)
 {
-    if (instructions.empty()) {
-        std::cout << "[Mediator] Empty evacuation instructions rejected."
-                  << std::endl;
+    if (instructions.empty()) 
+    {
+        std::cout << "[Mediator] Empty evacuation instructions rejected."<< std::endl;
         return;
     }
 
-    std::cout << "[Mediator] Coordinating evacuation: "
-              << instructions << std::endl;
+    std::cout << "[Mediator] Coordinating evacuation: "<< instructions << std::endl;
 
     for (std::vector<Participant*>::iterator it = participant.begin();
          it != participant.end(); ++it) {

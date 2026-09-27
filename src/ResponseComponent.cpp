@@ -6,11 +6,15 @@ ResponseComponent::ResponseComponent() {
     myId = "unknown-responder";
 }
 
-void ResponseComponent::reg(CampusMediator* em) {
+void ResponseComponent::reg(CampusMediator* em)
+{
     emergency = em;
-    myId = emergency->addParticipant(this);
-}
 
+    if (emergency != nullptr)
+    {
+        myId = emergency->addParticipant(this);
+    }
+}
 void ResponseComponent::cancel() {
     if (emergency != nullptr) {
         emergency->removeParticipant(myId);

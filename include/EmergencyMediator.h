@@ -8,9 +8,6 @@ class EmergencyMediator : public CampusMediator {
 public:
     EmergencyMediator(std::string em,std::string loc);
 
-protected:
-    std::string em;
-    std::string loc;
 };
 
 

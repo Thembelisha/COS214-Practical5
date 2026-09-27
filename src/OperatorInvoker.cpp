@@ -5,13 +5,26 @@ OperatorInvoker::OperatorInvoker(EmergencyCommand* _alert,EmergencyCommand* lock
     this->no_alert=no_alert;
     this->lockdown=lockdown;
 }
-  void OperatorInvoker::alert(){
-    _alert->execute();
+void OperatorInvoker::alert()
+{
+    if (_alert != nullptr)
+    {
+      _alert->execute();
+    }
+}
 
-  }
-  void OperatorInvoker::noAlert(){
-    no_alert->execute();
-  }
-  void OperatorInvoker::lockDown(){
-    lockdown->execute();
-  }
+void OperatorInvoker::noAlert()
+{
+    if (no_alert != nullptr)
+    {
+      no_alert->execute();
+    }
+}
+
+void OperatorInvoker::lockDown()
+{
+    if (lockdown != nullptr)
+    {
+      lockdown->execute();
+    }
+}
