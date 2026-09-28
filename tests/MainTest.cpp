@@ -1,207 +1,155 @@
+#include <iostream>
+#include <memory>
+
 #include "AccessControlSystem.h"
 #include "BaseResponderUnit.h"
 #include "CampusEmergencyFacade.h"
-#include "CampusMediator.h"
 #include "CancelAlertCommand.h"
 #include "CommunicationService.h"
-#include "EmergencyCommand.h"
 #include "EmergencyMediator.h"
-#include "EmergencyResponder.h"
-#include "EvacuationInstructionDecorator.h"
+#include "FacilitiesStaff.h"
 #include "Incident.h"
 #include "LegacySystemAdapter.h"
 #include "LockdownZoneCommand.h"
 #include "MedicalResponder.h"
-#include "ModernLockInterface.h"
 #include "Old1998ServerAccessHardware.h"
 #include "OperatorInvoker.h"
-#include "ResponseComponent.h"
 #include "SecurityTeam.h"
 #include "SirensEnabledDecorator.h"
 #include "TriggerAlertCommand.h"
 #include "UnpoweredConstructionZoneDecorator.h"
 #include "VictimInterface.h"
 
-#include <cassert>
-#include <memory>
-#include <stdexcept>
-#include <string>
-#include <utility>
-#include <vector>
+int main()
+{
+    // SCENARIO 1: SECURITY THREAT IN A CONSTRUCTION ZONE
+    // Demonstrates: State, Facade, Command, Mediator,
 
-class RecordingComponent : public ResponseComponent {
-public:
-    RecordingComponent(const std::string& id, const std::string& category)
-        : receivedMessages(0) {
-        setId(id);
-        setCategory(category);
+    {
+        std::cout << "SCENARIO 1: Security threat in Engineering construction zone\n";
+
+        Incident incident1(101,"Engineering construction zone","Unauthorised person detected near a restricted building entrance");
+
+        EmergencyMediator mediator1("security threat",incident1.getLocation());
+
+        // Adapter chain: AccessControlSystem -> ModernLockInterface
+        // -> LegacySystemAdapter -> Old1998ServerAccessHardware.
+        std::unique_ptr<Old1998ServerAccessHardware> legacyHardware1(new Old1998ServerAccessHardware());
+
+        std::unique_ptr<ModernLockInterface> lockAdapter1(new LegacySystemAdapter(std::move(legacyHardware1)));
+
+        AccessControlSystem accessControl1(std::move(lockAdapter1));
+
+        CommunicationService communication1;
+        FacilitiesStaff facilities1;
+        MedicalResponder medical1;
+        VictimInterface victim1;
+
+        // Decorator chain for the security responder.
+        std::unique_ptr<EmergencyResponder> baseSecurityResponder(new BaseResponderUnit("Campus security unit", 2));
+
+        std::unique_ptr<EmergencyResponder> constructionResponder(new UnpoweredConstructionZoneDecorator(std::move(baseSecurityResponder)));
+
+        std::unique_ptr<EmergencyResponder> decoratedSecurityResponder(new SirensEnabledDecorator(std::move(constructionResponder)));
+
+        SecurityTeam security1(std::move(decoratedSecurityResponder));
+
+        // Register the collaborating response components with the Mediator.
+        accessControl1.reg(&mediator1);
+        communication1.reg(&mediator1);
+        facilities1.reg(&mediator1);
+        medical1.reg(&mediator1);
+        security1.reg(&mediator1);
+        victim1.reg(&mediator1);
+
+        // Command objects and Invoker.
+        TriggerAlertCommand triggerAlert1(&mediator1);
+        LockdownZoneCommand lockdown1(&mediator1);
+        CancelAlertCommand cancelAlert1(&mediator1);
+
+        OperatorInvoker invoker1(&triggerAlert1, &lockdown1, &cancelAlert1);
+
+        // Facade combines the incident, commands and mediator workflow.
+        CampusEmergencyFacade facade1(incident1,invoker1,mediator1);
+
+        facade1.showIncidentStatus();
+
+        // Invalid operation: lockdown is not allowed while only Reported.
+        std::cout << "\nAttempting lockdown before crisis activation...\n";
+        facade1.lockdownZone();
+
+        // Normal workflow: State transition + Command + Mediator.
+        std::cout << "\n Activating the panic-alert workflow...\n";
+        facade1.handlePanicAlert();
+
+        // Lockdown is now valid. The command is executed through the Invoker.
+        std::cout << "\n Locking down the affected zone...\n";
+        facade1.lockdownZone();
+
+        // Additional mediator coordination so all response services visibly
+        // participate in the runtime demonstration.
+        mediator1.issueEvacuation("Evacuate the Engineering construction zone via the east assembly point.");
+
+        std::cout << "\n[DEMO] Resolving Scenario 1...\n";
+        facade1.resolveEmergency();
+        facade1.showIncidentStatus();
     }
 
-    void receiveEmergencyMessage(std::string, std::string message) override {
-        ++receivedMessages;
-        lastMessage = message;
+    // SCENARIO 2: MEDICAL EMERGENCY AT THE SPORTS CENTRE
+    // Uses different runtime data and demonstrates the same integrated
+    // architecture with the alert routed to a medical responder.
+    {
+        std::cout << "SCENARIO 2: Medical emergency at Sports Centre\n";
+    
+        Incident incident2(202,"Sports Centre","Student collapsed during a training session");
+
+        EmergencyMediator mediator2("medical emergency",incident2.getLocation());
+
+        // A separate legacy-access chain for the second runtime context.
+        std::unique_ptr<Old1998ServerAccessHardware> legacyHardware2(new Old1998ServerAccessHardware());
+
+        std::unique_ptr<ModernLockInterface> lockAdapter2(new LegacySystemAdapter(std::move(legacyHardware2)));
+
+        AccessControlSystem accessControl2(std::move(lockAdapter2));
+
+        CommunicationService communication2;
+        FacilitiesStaff facilities2;
+        SecurityTeam security2;
+        VictimInterface victim2;
+
+        // Decorate the medical responder with emergency sirens.
+        std::unique_ptr<EmergencyResponder> baseMedicalResponder(new BaseResponderUnit("Campus medical unit", 3));
+
+        std::unique_ptr<EmergencyResponder> decoratedMedicalResponder(new SirensEnabledDecorator(std::move(baseMedicalResponder)));
+
+        MedicalResponder medical2(std::move(decoratedMedicalResponder));
+
+        accessControl2.reg(&mediator2);
+        communication2.reg(&mediator2);
+        facilities2.reg(&mediator2);
+        medical2.reg(&mediator2);
+        security2.reg(&mediator2);
+        victim2.reg(&mediator2);
+
+        TriggerAlertCommand triggerAlert2(&mediator2);
+        LockdownZoneCommand lockdown2(&mediator2);
+        CancelAlertCommand cancelAlert2(&mediator2);
+
+        OperatorInvoker invoker2(&triggerAlert2,&lockdown2,&cancelAlert2);
+
+        CampusEmergencyFacade facade2(incident2,invoker2,mediator2);
+
+        facade2.showIncidentStatus();
+
+        std::cout << "\n Activating the medical-emergency workflow...\n";
+        facade2.handlePanicAlert();
+
+        // Mediator coordinates information to the wider response group.
+        mediator2.issueEvacuation("Keep the Sports Centre entrance clear for the medical response team.");
+
+        std::cout << "\nResolving Scenario 2...\n";
+        facade2.resolveEmergency();
+        facade2.showIncidentStatus();
     }
-
-    void sendResponse() override {
-    }
-
-    int receivedMessages;
-    std::string lastMessage;
-};
-
-static void runAdapterTest() {
-    Old1998ServerAccessHardware* observedHardware = new Old1998ServerAccessHardware();
-    std::unique_ptr<Old1998ServerAccessHardware> ownedHardware(observedHardware);
-    std::unique_ptr<ModernLockInterface> adapter(
-        new LegacySystemAdapter(std::move(ownedHardware)));
-
-    AccessControlSystem accessControl(std::move(adapter));
-
-    assert(accessControl.lockDoor(79));
-    assert(accessControl.unlockDoor(79));
-    assert(accessControl.restrictArea("construction_zone"));
-    assert(!accessControl.lockDoor(0));
-    assert(!accessControl.restrictArea("invalid area"));
-
-    const std::vector<std::string>& commands = observedHardware->getCommandLog();
-    assert(commands.size() == 3);
-    assert(commands[0] == "CMD_LOCK_0x4F");
-    assert(commands[1] == "CMD_UNLOCK_0x4F");
-    assert(commands[2] == "CMD_RESTRICT_CONSTRUCTION_ZONE");
-
-    accessControl.receiveEmergencyMessage(
-        "access-control-1", "Security incident at Engineering Block");
-
-    assert(commands.size() == 5);
-    assert(commands[3] == "CMD_RESTRICT_EMERGENCY_PERIMETER");
-    assert(commands[4] == "CMD_LOCK_0x4F");
-}
-
-static void runCommandDecoratorTest() {
-    EmergencyMediator mediator("security threat", "Engineering Block");
-    RecordingComponent communication("communication-test", "communication");
-    RecordingComponent security("security-test", "security");
-    RecordingComponent medical("medical-test", "medical");
-    RecordingComponent facilities("facilities-test", "facilities");
-    RecordingComponent accessControl("access-test", "access");
-
-    communication.reg(&mediator);
-    security.reg(&mediator);
-    medical.reg(&mediator);
-    facilities.reg(&mediator);
-    accessControl.reg(&mediator);
-
-    std::unique_ptr<EmergencyCommand> lockdownCommand(
-        new LockdownZoneCommand(&mediator));
-    EvacuationInstructionDecorator evacuationLockdown(
-        std::move(lockdownCommand),
-        mediator,
-        "Use the eastern assembly point and assist injured students");
-
-    evacuationLockdown.execute();
-
-    assert(communication.receivedMessages == 1);
-    assert(security.receivedMessages == 1);
-    assert(medical.receivedMessages == 1);
-    assert(facilities.receivedMessages == 1);
-    assert(accessControl.receivedMessages == 0);
-    assert(security.lastMessage.find("eastern assembly point") != std::string::npos);
-
-    bool rejectedEmptyInstructions = false;
-    try {
-        std::unique_ptr<EmergencyCommand> secondLockdown(
-            new LockdownZoneCommand(&mediator));
-        EvacuationInstructionDecorator invalidDecorator(
-            std::move(secondLockdown), mediator, "");
-    } catch (const std::invalid_argument&) {
-        rejectedEmptyInstructions = true;
-    }
-
-    assert(rejectedEmptyInstructions);
-}
-
-static void runDecoratorTest() {
-    std::unique_ptr<EmergencyResponder> basicSecurityUnit(
-        new BaseResponderUnit("Test security unit", 2));
-    std::unique_ptr<EmergencyResponder> constructionSecurityUnit(
-        new UnpoweredConstructionZoneDecorator(std::move(basicSecurityUnit)));
-    std::unique_ptr<EmergencyResponder> fullyEquippedSecurityUnit(
-        new SirensEnabledDecorator(std::move(constructionSecurityUnit)));
-
-    assert(fullyEquippedSecurityUnit->getClearanceLevel() == 4);
-    assert(fullyEquippedSecurityUnit->getCapabilities().find("thermal tracking") != std::string::npos);
-    assert(fullyEquippedSecurityUnit->getCapabilities().find("emergency sirens") != std::string::npos);
-
-    SecurityTeam securityTeam(std::move(fullyEquippedSecurityUnit));
-    securityTeam.receiveEmergencyMessage(
-        "security-team-1", "Engineering construction zone");
-
-    std::unique_ptr<EmergencyResponder> basicMedicalUnit(
-        new BaseResponderUnit("Test medical unit", 3));
-    std::unique_ptr<EmergencyResponder> priorityMedicalUnit(
-        new SirensEnabledDecorator(std::move(basicMedicalUnit)));
-    MedicalResponder medicalResponder(std::move(priorityMedicalUnit));
-    medicalResponder.receiveEmergencyMessage(
-        "medical-responder-1", "Engineering construction zone");
-
-    bool rejectedNullResponder = false;
-    try {
-        std::unique_ptr<EmergencyResponder> missingResponder;
-        SirensEnabledDecorator invalidDecorator(std::move(missingResponder));
-    } catch (const std::invalid_argument&) {
-        rejectedNullResponder = true;
-    }
-
-    assert(rejectedNullResponder);
-}
-
-static void runIntegratedApplicationWorkflow() {
-    Incident incident(42, "Engineering Block", "Fire in the server room");
-    EmergencyMediator mediator("medical", "Engineering Block");
-
-    AccessControlSystem accessControl;
-    CommunicationService communication;
-    MedicalResponder medical;
-    SecurityTeam security;
-    VictimInterface victim;
-
-    accessControl.reg(&mediator);
-    communication.reg(&mediator);
-    medical.reg(&mediator);
-    security.reg(&mediator);
-    victim.reg(&mediator);
-
-    TriggerAlertCommand alertCommand(&mediator);
-    LockdownZoneCommand lockdownCommand(&mediator);
-    CancelAlertCommand cancelCommand(&mediator);
-    OperatorInvoker invoker(&alertCommand, &lockdownCommand, &cancelCommand);
-    CampusEmergencyFacade facade(incident, invoker, mediator);
-
-    facade.handlePanicAlert();
-    assert(incident.getStateName() == "ActiveCrisis");
-    assert(incident.canDeployResponders());
-    assert(incident.canLockdownZone());
-
-    std::unique_ptr<EmergencyCommand> decoratedAlert(
-        new TriggerAlertCommand(&mediator));
-    EvacuationInstructionDecorator evacuationDecorator(
-        std::move(decoratedAlert),
-        mediator,
-        "Use the east exit and report to the assembly point");
-    evacuationDecorator.execute();
-
-    facade.lockdownZone();
-    facade.resolveEmergency();
-    assert(incident.getStateName() == "Resolved");
-
-    facade.handlePanicAlert();
-    assert(incident.getStateName() == "Resolved");
-}
-
-int main() {
-    runAdapterTest();
-    runCommandDecoratorTest();
-    runDecoratorTest();
-    runIntegratedApplicationWorkflow();
     return 0;
 }

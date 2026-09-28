@@ -1,0 +1,5 @@
+services:
+  campusguard:
+    build: .
+    image: cpp-gdb
+    command: ./bin/tests/main
